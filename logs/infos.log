@@ -1,0 +1,12 @@
+INFO       - 2024-04-01 14:12:34,428 - client          : logging in using static token
+INFO       - 2024-04-01 14:12:35,526 - gateway         : Shard ID None has connected to Gateway (Session ID: f81a538a7c2bdddb195e01f4aba64572).
+ERROR      - 2024-04-02 00:03:55,177 - client          : Attempting a reconnect in 0.09s
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/site-packages/discord/client.py", line 659, in connect
+    await self.ws.poll_event()
+  File "/usr/local/lib/python3.8/site-packages/discord/gateway.py", line 646, in poll_event
+    raise ConnectionClosed(self.socket, shard_id=self.shard_id, code=code) from None
+discord.errors.ConnectionClosed: Shard ID None WebSocket closed with 1000
+INFO       - 2024-04-02 00:03:55,637 - gateway         : Shard ID None session has been invalidated.
+INFO       - 2024-04-02 00:04:01,140 - gateway         : Shard ID None has connected to Gateway (Session ID: 17ab0e48faf63b00fe9590de0097893f).
+INFO       - 2024-04-02 00:39:07,491 - gateway         : Shard ID None has successfully RESUMED session 17ab0e48faf63b00fe9590de0097893f.

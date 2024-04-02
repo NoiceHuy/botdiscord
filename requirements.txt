@@ -1,0 +1,16 @@
+discord-py == 2.3.2
+utils == 1.0.2
+flask == 3.0.2
+logging == 0.4.9.6
+dotenv-python == 0.0.1
+asyncio == 3.4.3
+pandas == 2.2.1
+requests == 2.31.0
+replit == 3.6.1
+matplotlib == 3.8.3
+wavelink == ^3.2.0
+youtube-dl == ^2021.12.17
+giphy-client == ^1.0.0
+pymongo == ^4.6.3
+python-dotenv == ^1.0.1
+pynacl == 1.5.0
