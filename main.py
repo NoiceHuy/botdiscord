@@ -196,14 +196,14 @@ async def help(ctx):
         name="mazer", value="Hiển thị thông tin cửa hàng Mazer và liên kết cửa hàng.")
     help_embed.add_field(
         name="userinfo [@user]", value="Hiên thị thông tin của người dùng.")
-    help_embed.add_field(name="dangky", value="BETA")
+    help_embed.add_field(name="dangky", value="BETA1")
     await ctx.send(embed=help_embed)
 
 
 @client.command()
 async def dangky(ctx):
     embed = discord.Embed(
-        title="verification", description="(BETA).")
+        title="Đăng ký", description="(BETA).")
     await ctx.send(embed=embed, view=verification())
 
 
