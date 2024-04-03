@@ -138,11 +138,10 @@ class Menu(discord.ui.View):
         title3 = self.title3.value
         title4 = self.title4.value
         title5 = self.title5.value
+        
         embed = discord.Embed(title="Thông tin đăng nhập ",
-                              description="BETA")
-        embed.add_field(name="BETA", value="BETA")
-        embed.add_field(name="BETA", value="BETA")
-        embed.add_field(name="BETA", value="BETA")
+                              description=f"Số tài khoản: {title1}\nCTK: {title2}\nID DISCORD: {title3}\nLink Facebook cá nhân: {title4}\nZalo: {title5}", color=0x00ff00)
+
         
         await interaction.response.send_message(f"Bạn đã thành công gửi yêu cầu verify tới admin!", ephemeral=True)
         channel = interaction.guild.get_channel(CHECK_VERIFY_CHANNEL_ID)
@@ -296,12 +295,27 @@ async def vote(ctx, member: discord.Member = None):
 
 @client.command(help='Hiện thông tin cá nhân')
 async def userinfo(ctx, member: discord.Member = None):
+    global luu_vote
+    global vote_complete
+    luu_vote = await read_votes()
+    vote_complete = 0
+    checkgdv_channel = ctx.guild.get_channel(VOTE_CHANNEL_ID)
+    view = Menu(ctx.author.id)
+    member = member if member else ctx.author
+    checkuytin = ""
+    # x = thisdict.get("model")
+    if str(ctx.author.id) in luu_vote:
+        vote_complete = luu_vote.get(str(ctx.author.id))
+    if vote_complete == 0:
+        checkuytin = "không uy tín"
+    else:
+        checkuytin = "uy tín"
     member = member if member else ctx.author
     roles = [role for role in member.roles]
     embed = discord.Embed(
         colour=member.colour, timestamp=ctx.message.created_at, description=f"Vote {member}")
     embed.set_author(name=f"Thông tin người dùng - {ctx.author}")
-    embed.add_field(name="Số vote", value="1")
+    embed.add_field(name="Số vote", value=f"{checkuytin}")
     embed.add_field(name=f"Vai trò ({len(roles)})", value=" ".join(
         [role.mention for role in roles]))
     embed.add_field(name="ID:", value=member.id)
