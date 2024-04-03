@@ -21,9 +21,10 @@ import settings
 import error_handle
 # import play_music
 
-
+CHECK_VERIFY_CHANNEL_ID = 1224997926871236679
 VOTE_CHANNEL_ID = 1220993715531677708
 DISCORD_API = os.environ['DISCORD_API']
+
 logger = systems.logging.getLogger("bot")
 
 
@@ -45,6 +46,34 @@ async def read_votes():
 async def update_votes(vote_dict):
     with open(VOTE_FILE, "w") as f:
         json.dump(vote_dict, f)
+
+
+class formDangKy(discord.ui.Modal, title="Đăng ký"):
+    title1 = discord.ui.TextInput(
+        style=discord.TextStyle.short,
+        label="Số tài khoản",
+        required=False,
+        placeholder="Nhập số tài khoản",)
+    title2 = discord.ui.TextInput(
+        style=discord.TextStyle.short,
+        label="CTK",
+        required=False,
+        placeholder="Nhập CTK",)
+    title3 = discord.ui.TextInput(
+        style=discord.TextStyle.short,
+        label="ID DISCORD",
+        required=False,
+        placeholder="Nhập ID",)
+    title4 = discord.ui.TextInput(
+        style=discord.TextStyle.short,
+        label="Link Facebook cá nhân",
+        required=False,
+        placeholder="Link Facebook",)
+    title5 = discord.ui.TextInput(
+        style=discord.TextStyle.short,
+        label="Zalo",
+        required=False,
+        placeholder="SĐT Zalo",)
 
 
 class Menu(discord.ui.View):
@@ -84,6 +113,40 @@ class Menu(discord.ui.View):
         self.value = False
         self.stop()
 # Prefix/setup
+
+    async def on_submit(self, ctx, interaction: discord.Interaction, member: discord.Member = None):
+        username = member if member else ctx.author
+        title1 = self.title1.value
+        title2 = self.title2.value
+        title3 = self.title3.value
+        title4 = self.title4.value
+        title5 = self.title5.value
+        embed = discord.Embed(title=f"Thông tin đăng nhập {username}",
+                              description=f"1: {title5}")
+        await interaction.response.send_message(f"Bạn đã thành công gửi yêu cầu verify tới admin!", ephemeral=True)
+        channel = interaction.guild.get_channel(CHECK_VERIFY_CHANNEL_ID)
+        await channel.send(embed=embed)
+        time.sleep(3)
+        await interaction.delete_original_response()
+
+
+class verification(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    # @discord.ui.button(label="Verify", custom_id="Verify", style=discord.ButtonStyle.success)
+    # async def verify(self, verify, button):
+    #     role = 1224875800961224756
+    #     user = verify.user
+    #     if role not in [y.id for y in user.roles]:
+    #         await user.add_roles(user.guild.get_role(role))
+    #         await user.send("Ban da verify thanh cong !")
+    #     else:
+    #         await user.send("Ban da verify roi !")
+
+    @discord.ui.button(label="Sign in", style=discord.ButtonStyle.grey)
+    async def sign_in(self, sign_in, button):
+        await sign_in.response.send_modal(formDangKy())
 
 
 # intents
@@ -125,12 +188,20 @@ async def help(ctx):
     help_embed.set_author(name="MAZER BOT")
     help_embed.add_field(name="clear [amout]", value="Xóa tin nhắn")
     help_embed.add_field(name="checkcoc [@user]", value="Check tiền cọc")
-    help_embed.add_field(name="vote [@user]", value="BETA")
+    help_embed.add_field(name="vote [@user]", value="Vote uy tín")
     help_embed.add_field(
         name="mazer", value="Hiển thị thông tin cửa hàng Mazer và liên kết cửa hàng.")
     help_embed.add_field(
         name="userinfo [@user]", value="Hiên thị thông tin của người dùng.")
+    help_embed.add_field(name="dangky", value="BETA")
     await ctx.send(embed=help_embed)
+
+
+@client.command()
+async def dangky(ctx):
+    embed = discord.Embed(
+        title="verification", description="(BETA).")
+    await ctx.send(embed=embed, view=verification())
 
 
 @client.command()
@@ -250,18 +321,6 @@ async def mazer(ctx, member: discord.Member = None):
     await ctx.send(embed=embed, view=view)
 
 
-# def ghi_file(data):
-#     with open("data.txt", "a") as f:
-#         f.write(data + "\n")
-
-
-# @client.event
-# async def on_message(message):
-#     if message.channel.id == CHANNEL_ID:
-#         if message.content.startswith("!"):
-#             gia_tri = message.content[1:]
-#             ghi_file(gia_tri)
-#             await message.channel.send(f"Giá trị `{gia_tri}` đã được lưu vào file data.txt")
 
 keep_alive()
 client.run(systems.DISCORD_API, root_logger=True)
