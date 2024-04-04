@@ -77,17 +77,13 @@ class formDangKy(discord.ui.Modal, title="Đăng ký"):
         placeholder="SĐT Zalo",)
 
     async def on_submit(self, interaction: discord.Interaction):
+
         title1 = self.title1.value
         title2 = self.title2.value
         title3 = self.title3.value
         title4 = self.title4.value
         title5 = self.title5.value
-        embed = discord.Embed(title="Thông tin đăng nhập ",description="BETA")
-                                
-        embed.add_field(name="BETA", value="BETA")
-        embed.add_field(name="BETA", value="BETA")
-        embed.add_field(name="BETA", value="BETA")
-    
+        embed = discord.Embed(title="Thông tin đăng nhập ", description=f"Số tài khoản: {title1}\nCTK: {title2}\nID DISCORD: {title3}\nLink Facebook cá nhân: {title4}\nZalo: {title5}", color=0x00ff00)
         await interaction.response.send_message(f"Bạn đã thành công gửi yêu cầu verify tới admin!", ephemeral=True)
         channel = interaction.guild.get_channel(CHECK_VERIFY_CHANNEL_ID)
         await channel.send(embed=embed)
