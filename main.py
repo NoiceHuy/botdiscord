@@ -193,6 +193,8 @@ class verification(discord.ui.View):
 
     @discord.ui.button(label="Đăng ký", style=discord.ButtonStyle.grey)
     async def sign_in(self, sign_in, button):
+        global user_id
+        user_id = sign_in.user.id
         await sign_in.response.send_modal(formDangKy())
 
 
@@ -229,7 +231,7 @@ async def help(ctx):
         name="mazer", value="Hiển thị thông tin cửa hàng Mazer và liên kết cửa hàng.")
     help_embed.add_field(
         name="userinfo [@user]", value="Hiên thị thông tin của người dùng.")
-    help_embed.add_field(name="dangky", value="BETA1")
+    help_embed.add_field(name="verify", value="Để gửi form verify tới admin")
     await ctx.send(embed=help_embed)
 
 @client.command()
