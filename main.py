@@ -184,15 +184,6 @@ class verification(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    # @discord.ui.button(label="Verify", custom_id="Verify", style=discord.ButtonStyle.success)
-    # async def verify(self, verify, button):
-    #     role = 1224875800961224756
-    #     user = verify.user
-    #     if role not in [y.id for y in user.roles]:
-    #         await user.add_roles(user.guild.get_role(role))
-    #         await user.send("Ban da verify thanh cong !")
-    #     else:
-    #         await user.send("Ban da verify roi !")
 
     @discord.ui.button(label="Đăng ký", style=discord.ButtonStyle.grey)
     async def sign_in(self, sign_in, button):
@@ -246,7 +237,7 @@ async def verify(ctx, member: discord.Member = None):
     embed = discord.Embed(
         title="Đăng ký", description="Hướng dẫn Verify.")
     embed.add_field(
-        name="Thông tin 24h sau khi nhận được tin đã đăng ký.", value="```- Mọi người dms riêng gửi stk / CTK / id discord / link facebook / zalo / lưu ý 1 thông tin chỉ được vào một lần\n- Có thể dms support hoặc gửi thông tin vào chat hỗ trợ ```")
+        name="Thông tin 24h sau khi nhận được tin đã đăng ký.", value="```- Mọi người điền đầy đủ thông tin, username/ stk / CTK / id discord / link facebook / zalo / lưu ý 1 thông tin chỉ được vào một lần\n- Có thể dms support hoặc gửi thông tin vào chat để hỗ trợ\n- Điền thông tin chính xác và đầy đủ nếu điền sai sẽ không thành Member ```")
 
     await ctx.send(embed=embed, view=verification())
 
