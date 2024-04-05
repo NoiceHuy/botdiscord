@@ -21,17 +21,20 @@ import systems
 import settings
 import error_handle
 # import play_music
-
-user_id = None
-CHECK_VERIFY_CHANNEL_ID = 1224997926871236679
-VOTE_CHANNEL_ID = 1220993715531677708
-DISCORD_API = os.environ['DISCORD_API']
-
 logger = systems.logging.getLogger("bot")
 
-
+user_id = None
+VOTE_CHANNEL_ID = 1223902138493698109
 VOTE_FILE = "vote_file.txt"
+CHECK_VERIFY_CHANNEL_ID = 1224973082754547774
 
+intents = discord.Intents.all()
+intents.message_content = True
+intents.members = True
+
+# client
+client = commands.Bot(command_prefix=".", intents=intents)
+client.remove_command("help")
 
 async def read_votes():
     """Reads vote count from the file."""
@@ -48,78 +51,6 @@ async def read_votes():
 async def update_votes(vote_dict):
     with open(VOTE_FILE, "w") as f:
         json.dump(vote_dict, f)
-
-
-
-class formDangKy(discord.ui.Modal, title="Đăng ký"):
-    title1 = discord.ui.TextInput(
-        style=discord.TextStyle.short,
-        label="Số tài khoản",
-        required=False,
-        placeholder="Nhập số tài khoản",)
-    title2 = discord.ui.TextInput(
-        style=discord.TextStyle.short,
-        label="CTK",
-        required=False,
-        placeholder="Nhập CTK",)
-    title3 = discord.ui.TextInput(
-        style=discord.TextStyle.short,
-        label="ID DISCORD",
-        required=False,
-        placeholder="Nhập ID",)
-    title4 = discord.ui.TextInput(
-        style=discord.TextStyle.short,
-        label="Link Facebook cá nhân",
-        required=False,
-        placeholder="Link Facebook",)
-    title5 = discord.ui.TextInput(
-        style=discord.TextStyle.short,
-        label="Zalo",
-        required=False,
-        placeholder="SĐT Zalo",)
-
-    async def on_submit(self, interaction: discord.Interaction):
-        user = client.get_user(user_id)
-        send_channel = CHECK_VERIFY_CHANNEL_ID
-        title1 = self.title1.value
-        title2 = self.title2.value
-        title3 = self.title3.value
-        title4 = self.title4.value
-        title5 = self.title5.value
-        embed = discord.Embed(title=f"Thông tin đăng nhập - {user.mention}",
-                              description=f"Số tài khoản: {title1}\nCTK: {title2}\nID DISCORD: {title3}\nLink Facebook cá nhân: {title4}\nZalo: {title5}", color=0x00ff00)
-        print(f"The user entered Discord ID: {title3}")
-        await interaction.response.send_message(f"Bạn đã thành công gửi yêu cầu verify tới admin!", ephemeral=True)
-        channel = interaction.guild.get_channel(CHECK_VERIFY_CHANNEL_ID)
-        await channel.send(embed=embed, view=Menu_Form())
-        time.sleep(3)
-        await interaction.delete_original_response()
-
-class Menu_Form(discord.ui.View):
-    def __init__(self, member: discord.Member = None):
-        super().__init__(timeout=None)
-
-        self.member = member
-        self.value = True
-
-    @discord.ui.button(label="Accept", style=discord.ButtonStyle.green)
-    async def menu1(self, interaction: discord.Interaction, button: discord.ui.Button):
-        user = client.get_user(user_id)
-        self.member = interaction.user
-        if self.value:
-            verify_role = discord.utils.get(
-                interaction.guild.roles, name="verify")
-            if verify_role:
-                await self.member.add_roles(verify_role)
-                await interaction.response.send_message(f"✅ {self.member.mention}.", ephemeral=True)
-
-                self.value = False
-                self.stop()
-
-    @discord.ui.button(label="Decline", style=discord.ButtonStyle.danger)
-    async def menu2(self, interaction: discord.Interaction, button: discord.ui.Button):
-        self.value = False
-        self.stop()
 
 class Menu(discord.ui.View):
     def __init__(self, user_id):
@@ -176,6 +107,75 @@ class Menu(discord.ui.View):
         time.sleep(3)
         await interaction.delete_original_response()
 
+class formDangKy(discord.ui.Modal, title="Đăng ký"):
+    title1 = discord.ui.TextInput(
+        style=discord.TextStyle.short,
+        label="Số tài khoản",
+        required=False,
+        placeholder="Nhập số tài khoản",)
+    title2 = discord.ui.TextInput(
+        style=discord.TextStyle.short,
+        label="CTK",
+        required=False,
+        placeholder="Nhập CTK",)
+    title3 = discord.ui.TextInput(
+        style=discord.TextStyle.short,
+        label="ID DISCORD",
+        required=False,
+        placeholder="Nhập ID",)
+    title4 = discord.ui.TextInput(
+        style=discord.TextStyle.short,
+        label="Link Facebook cá nhân",
+        required=False,
+        placeholder="Link Facebook",)
+    title5 = discord.ui.TextInput(
+        style=discord.TextStyle.short,
+        label="Zalo",
+        required=False,
+        placeholder="SĐT Zalo",)
+
+    async def on_submit(self, interaction: discord.Interaction):
+        user = client.get_user(user_id)
+        send_channel = CHECK_VERIFY_CHANNEL_ID
+        title1 = self.title1.value
+        title2 = self.title2.value
+        title3 = self.title3.value
+        title4 = self.title4.value
+        title5 = self.title5.value
+        embed = discord.Embed(title=f"Thông tin đăng nhập - {user.mention}",
+                              description=f"Số tài khoản: {title1}\nCTK: {title2}\nID DISCORD: {title3}\nLink Facebook cá nhân: {title4}\nZalo: {title5}", color=0x00ff00)
+        await interaction.response.send_message(f"Bạn đã thành công gửi yêu cầu verify tới admin!", ephemeral=True)
+        channel = interaction.guild.get_channel(CHECK_VERIFY_CHANNEL_ID)
+        await channel.send(embed=embed, view=Menu_Form())
+        time.sleep(3)
+        await interaction.delete_original_response()
+
+class Menu_Form(discord.ui.View):
+    def __init__(self, member: discord.Member = None):
+        super().__init__(timeout=None)
+
+        self.member = member
+        self.value = True
+
+    @discord.ui.button(label="Accept", style=discord.ButtonStyle.green)
+    async def menu1(self, interaction: discord.Interaction, button: discord.ui.Button):
+        user = client.get_user(user_id)
+        self.member = interaction.user
+        if self.value:
+            verify_role = discord.utils.get(
+                interaction.guild.roles, name="verify")
+            if verify_role:
+                await self.member.add_roles(verify_role)
+                await interaction.response.send_message(f"✅ {self.member.mention}.", ephemeral=True)
+
+                self.value = False
+                self.stop()
+
+    @discord.ui.button(label="Decline", style=discord.ButtonStyle.danger)
+    async def menu2(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.value = False
+        self.stop()
+
 
 class verification(discord.ui.View):
     def __init__(self):
@@ -196,23 +196,13 @@ class verification(discord.ui.View):
         await sign_in.response.send_modal(formDangKy())
 
 
-# intents
-intents = discord.Intents.all()
-intents.message_content = True
-intents.members = True
-
-# client
-client = commands.Bot(command_prefix=".", intents=intents)
-client.remove_command("help")
 
 # Events
-
 
 @client.event
 async def on_ready():
     await client.change_presence(status=discord.Status.online, activity=discord.Game('Mua Robux Tại Mazer Store'))
     logger.info(f"User:{client.user} (ID: {client.user.id})")
-
 
 @client.event
 async def on_command_error(ctx, error):
@@ -221,13 +211,12 @@ async def on_command_error(ctx, error):
         time.sleep(1)
         await ctx.channel.purge(limit=1)
 
-
 @client.event
 async def on_member_join(member):
     role = discord.utils.get(member.guild.roles, name='Unverified')
     await member.add_roles(role)
 
-
+#commands
 @client.command()
 async def help(ctx):
     help_embed = discord.Embed(
@@ -243,7 +232,6 @@ async def help(ctx):
     help_embed.add_field(name="dangky", value="BETA1")
     await ctx.send(embed=help_embed)
 
-
 @client.command()
 async def verify(ctx, member: discord.Member = None):
     global user_id
@@ -256,7 +244,6 @@ async def verify(ctx, member: discord.Member = None):
         name="Thông tin 24h sau khi nhận được tin đã đăng ký.", value="```- Mọi người dms riêng gửi stk / CTK / id discord / link facebook / zalo / lưu ý 1 thông tin chỉ được vào một lần\n- Có thể dms support hoặc gửi thông tin vào chat hỗ trợ ```")
 
     await ctx.send(embed=embed, view=verification())
-
 
 @client.command()
 async def checkcoc(ctx, user: discord.Member = None):
