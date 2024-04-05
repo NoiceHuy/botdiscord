@@ -108,6 +108,11 @@ class Menu(discord.ui.View):
         await interaction.delete_original_response()
 
 class formDangKy(discord.ui.Modal, title="Đăng ký"):
+    title0 = discord.ui.TextInput(
+        style=discord.TextStyle.short,
+        label="Tên đăng nhập",
+        required=False,
+        placeholder="Nhập tên đăng nhập",)
     title1 = discord.ui.TextInput(
         style=discord.TextStyle.short,
         label="Số tài khoản",
@@ -159,15 +164,13 @@ class Menu_Form(discord.ui.View):
 
     @discord.ui.button(label="Accept", style=discord.ButtonStyle.green)
     async def menu1(self, interaction: discord.Interaction, button: discord.ui.Button):
-        user = client.get_user(user_id)
-        self.member = interaction.user
+        self.member = interaction.guild.get_member(user_id)
         if self.value:
             verify_role = discord.utils.get(
-                interaction.guild.roles, name="verify")
+                interaction.guild.roles, name="Member")
             if verify_role:
                 await self.member.add_roles(verify_role)
-                await interaction.response.send_message(f"✅ {self.member.mention}.", ephemeral=True)
-
+                await interaction.response.send_message(f"Đã xác minh người dùng {self.member}.")
                 self.value = False
                 self.stop()
 
