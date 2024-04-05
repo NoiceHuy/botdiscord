@@ -24,9 +24,9 @@ import error_handle
 logger = systems.logging.getLogger("bot")
 
 user_id = None
-VOTE_CHANNEL_ID = 1223902138493698109
+VOTE_CHANNEL_ID = 1220993715531677708
 VOTE_FILE = "vote_file.txt"
-CHECK_VERIFY_CHANNEL_ID = 1224973082754547774
+CHECK_VERIFY_CHANNEL_ID = 1224997926871236679
 
 intents = discord.Intents.all()
 intents.message_content = True
