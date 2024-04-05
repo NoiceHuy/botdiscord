@@ -52,6 +52,7 @@ async def update_votes(vote_dict):
     with open(VOTE_FILE, "w") as f:
         json.dump(vote_dict, f)
 
+
 class Menu(discord.ui.View):
     def __init__(self, user_id):
         super().__init__()
@@ -90,29 +91,8 @@ class Menu(discord.ui.View):
         self.stop()
 # Prefix/setup
 
-    async def on_submit(self, interaction: discord.Interaction):
-        title1 = self.title1.value
-        title2 = self.title2.value
-        title3 = self.title3.value
-        title4 = self.title4.value
-        title5 = self.title5.value
-        
-        embed = discord.Embed(title="Thông tin đăng nhập ",
-                              description=f"Số tài khoản: {title1}\nCTK: {title2}\nID DISCORD: {title3}\nLink Facebook cá nhân: {title4}\nZalo: {title5}", color=0x00ff00)
-
-        
-        await interaction.response.send_message(f"Bạn đã thành công gửi yêu cầu verify tới admin!", ephemeral=True)
-        channel = interaction.guild.get_channel(CHECK_VERIFY_CHANNEL_ID)
-        await channel.send(embed=embed)
-        time.sleep(3)
-        await interaction.delete_original_response()
 
 class formDangKy(discord.ui.Modal, title="Đăng ký"):
-    title0 = discord.ui.TextInput(
-        style=discord.TextStyle.short,
-        label="Tên đăng nhập",
-        required=False,
-        placeholder="Nhập tên đăng nhập",)
     title1 = discord.ui.TextInput(
         style=discord.TextStyle.short,
         label="Số tài khoản",
@@ -155,6 +135,7 @@ class formDangKy(discord.ui.Modal, title="Đăng ký"):
         time.sleep(3)
         await interaction.delete_original_response()
 
+
 class Menu_Form(discord.ui.View):
     def __init__(self, member: discord.Member = None):
         super().__init__(timeout=None)
@@ -184,13 +165,11 @@ class verification(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
-
     @discord.ui.button(label="Đăng ký", style=discord.ButtonStyle.grey)
     async def sign_in(self, sign_in, button):
         global user_id
         user_id = sign_in.user.id
         await sign_in.response.send_modal(formDangKy())
-
 
 
 # Events
@@ -200,6 +179,7 @@ async def on_ready():
     await client.change_presence(status=discord.Status.online, activity=discord.Game('Mua Robux Tại Mazer Store'))
     logger.info(f"User:{client.user} (ID: {client.user.id})")
 
+
 @client.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound):
@@ -207,12 +187,15 @@ async def on_command_error(ctx, error):
         time.sleep(1)
         await ctx.channel.purge(limit=1)
 
+
 @client.event
 async def on_member_join(member):
     role = discord.utils.get(member.guild.roles, name='Unverified')
     await member.add_roles(role)
 
-#commands
+# commands
+
+
 @client.command()
 async def help(ctx):
     help_embed = discord.Embed(
@@ -225,8 +208,10 @@ async def help(ctx):
         name="mazer", value="Hiển thị thông tin cửa hàng Mazer và liên kết cửa hàng.")
     help_embed.add_field(
         name="userinfo [@user]", value="Hiên thị thông tin của người dùng.")
-    help_embed.add_field(name="verify", value="Để gửi form verify tới admin")
+    help_embed.add_field(
+        name="verify", value="Để gửi form verify tới admin")
     await ctx.send(embed=help_embed)
+
 
 @client.command()
 async def verify(ctx, member: discord.Member = None):
@@ -237,9 +222,10 @@ async def verify(ctx, member: discord.Member = None):
     embed = discord.Embed(
         title="Đăng ký", description="Hướng dẫn Verify.")
     embed.add_field(
-        name="Thông tin 24h sau khi nhận được tin đã đăng ký.", value="```- Mọi người điền đầy đủ thông tin, username/ stk / CTK / id discord / link facebook / zalo / lưu ý 1 thông tin chỉ được vào một lần\n- Có thể dms support hoặc gửi thông tin vào chat để hỗ trợ\n- Điền thông tin chính xác và đầy đủ nếu điền sai sẽ không thành Member ```")
+        name="Thông tin sẽ được xác nhận trong vòng 24h.", value="```- Mọi người điền đầy đủ thông tin, stk / CTK / id discord / link facebook / zalo / lưu ý 1 thông tin chỉ được vào một lần\n- Có thể dms support hoặc gửi thông tin vào chat để hỗ trợ\n- Điền thông tin chính xác và đầy đủ nếu điền sai sẽ không thành Member ```")
 
     await ctx.send(embed=embed, view=verification())
+
 
 @client.command()
 async def checkcoc(ctx, user: discord.Member = None):
@@ -371,7 +357,6 @@ async def mazer(ctx, member: discord.Member = None):
                     value="**BIDV:** 8802092008 CTK: NGUYEN NGO DUC HIEU\n**MOMO:** 0899599536 CTK NGUYEN NGO DUC HIEU\n**TP BANK: 0966960889 CTK: NGO QUYNH NGA **", inline=False)
 
     await ctx.send(embed=embed, view=view)
-
 
 
 keep_alive()
