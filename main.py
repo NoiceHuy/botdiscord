@@ -263,9 +263,11 @@ async def vote(ctx, member: discord.Member = None):
     member_tag = member
     if member_tag == None:
         await ctx.send("Bạn đã nhập thiếu giá trị @[user]")
+        time.sleep(0.5)
         await ctx.channel.purge(limit=1)
     elif member_tag == ctx.author:
         await ctx.send("Bạn không được tự vote chính mình")
+        time.sleep(0.5)
         await ctx.channel.purge(limit=1)
     else:
         await open_vote_data(member_tag)
@@ -295,27 +297,18 @@ async def vote(ctx, member: discord.Member = None):
 
 @client.command(help='Hiện thông tin cá nhân')
 async def userinfo(ctx, member: discord.Member = None):
-    global luu_vote
-    global vote_complete
-    luu_vote = await read_votes()
-    vote_complete = 0
-    checkgdv_channel = ctx.guild.get_channel(VOTE_CHANNEL_ID)
-    view = Menu(ctx.author.id)
+    
     member = member if member else ctx.author
-    checkuytin = ""
-    # x = thisdict.get("model")
-    if str(ctx.author.id) in luu_vote:
-        vote_complete = luu_vote.get(str(ctx.author.id))
-    if vote_complete == 0:
-        checkuytin = "không uy tín"
-    else:
-        checkuytin = "uy tín"
-    member = member if member else ctx.author
+    await open_vote_data(member_tag)
+    print("command vote member_tag",member_tag)
+    get_member_tag = await get_vote_data()
     roles = [role for role in member.roles]
+    vote_count = get_member_tag[str(member_tag.id)]["Vouch"]
+    
     embed = discord.Embed(
         colour=member.colour, timestamp=ctx.message.created_at, description=f"Vote {member}")
     embed.set_author(name=f"Thông tin người dùng - {ctx.author}")
-    embed.add_field(name="Số vote", value=f"{checkuytin}")
+    embed.add_field(name="Số vote", value=f"{vote_count}")
     embed.add_field(name=f"Vai trò ({len(roles)})", value=" ".join(
         [role.mention for role in roles]))
     embed.add_field(name="ID:", value=member.id)
