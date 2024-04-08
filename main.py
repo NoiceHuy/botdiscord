@@ -36,57 +36,37 @@ intents.members = True
 client = commands.Bot(command_prefix=".", intents=intents)
 client.remove_command("help")
 
-async def read_votes():
-    """Reads vote count from the file."""
-    try:
-        with open(VOTE_FILE, "r") as f:
-            data = json.load(f)
-            return data
-    except (FileNotFoundError, json.JSONDecodeError):
-        with open(VOTE_FILE, "w") as f:
-            json.dump({}, f)
-        return {}
-
-
-async def update_votes(vote_dict):
-    with open(VOTE_FILE, "w") as f:
-        json.dump(vote_dict, f)
-
-
-class Menu(discord.ui.View):
-    def __init__(self, user_id):
+class MenuVote(discord.ui.View):
+    def __init__(self, member : discord.Member = None):
+        self.member = member_tag.id
         super().__init__()
         self.value = None
-        self.user_id = user_id
 
-    async def send(self, ctx):
-        channel = ctx.guild.get_channel(VOTE_CHANNEL_ID)
-        self.from_message = await channel.send(view=self)
 
-    @discord.ui.button(label="Accept", style=discord.ButtonStyle.green)
-    async def menu1(self, interaction: discord.Interaction, button: discord.ui.Button):
-        current_vote = await read_votes()
-        vote_count = current_vote.get(self.user_id, 0) + 1
-        current_vote[self.user_id] = vote_count
-        await update_votes(current_vote)
-        await interaction.response.edit_message(content=f"Vote: {vote_count}")
+    @discord.ui.button(label = 'Accept', style = discord.ButtonStyle.green)
+    async def accept_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        member_tag = self.member
+        get_member_tag = await get_vote_data()
+        get_member_tag[str(member_tag)]["Vouch"] += 1
+        with open("vote_save_data.json", "w") as f:
+            json.dump(get_member_tag,f)
+        await interaction.response.send_message(f"Đã + 1 vote cho {member_tag}")
         self.value = False
         self.stop()
 
-    @discord.ui.button(label="Decline", style=discord.ButtonStyle.danger)
-    async def menu2(self, interaction: discord.Interaction, button: discord.ui.Button):
-        current_votes = await read_votes()
-        vote_count = current_votes.get(self.user_id, 0) - 1
-        vote_count = max(vote_count, 0)
-        current_votes[self.user_id] = vote_count
-        await update_votes(current_votes)
-        await interaction.response.edit_message(content=f"Vote: {vote_count}")
+    @discord.ui.button(label = 'Deciline', style = discord.ButtonStyle.danger)
+    async def deciline_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        member_tag = self.member
+        get_member_tag = await get_vote_data()
+        get_member_tag[str(member_tag)]["Vouch"] -= 1
+        with open("vote_save_data.json", "w") as f:
+            json.dump(get_member_tag,f)
+        await interaction.response.send_message(f"Đã - 1 vote cho {member_tag}")
         self.value = False
         self.stop()
 
-    @discord.ui.button(label="None", style=discord.ButtonStyle.blurple)
-    async def menu3(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.edit_message(content="")
+    @discord.ui.button(label = 'None', style = discord.ButtonStyle.blurple)
+    async def none_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         self.value = False
         self.stop()
 # Prefix/setup
@@ -257,43 +237,42 @@ async def clear(ctx, amount: int):
     await ctx.channel.purge(limit=amount + 1)
 
 
-@ client.command()
+@client.command()
 async def vote(ctx, member: discord.Member = None):
     """Vote uy tín."""
-    global luu_vote
-    global vote_complete
-    luu_vote = await read_votes()
-    vote_complete = 0
-    checkgdv_channel = ctx.guild.get_channel(VOTE_CHANNEL_ID)
-    view = Menu(ctx.author.id)
-    member = member if member else ctx.author
-    checkuytin = ""
-    # x = thisdict.get("model")
-    if str(ctx.author.id) in luu_vote:
-        vote_complete = luu_vote.get(str(ctx.author.id))
-    if vote_complete == 0:
-        checkuytin = "không uy tín"
-    else:
-        checkuytin = "uy tín"
     roles = [role for role in member.roles]
-    embed = discord.Embed(
-        colour=member.colour, timestamp=ctx.message.created_at, description=f"Vote {member}")
-    embed.set_author(name=f"Duyệt vote - người gửi yêu cầu: {ctx.author}")
-    embed.add_field(name="Số vote", value=f"{checkuytin}")
-    embed.add_field(name=f"Vai trò ({len(roles)})", value=" ".join(
-        [role.mention for role in roles]))
-    embed.add_field(name="ID:", value=member.id)
-    embed.add_field(name="Tên hiển thị:", value=member.display_name)
-    embed.add_field(name="Ngày tạo:", value=member.created_at.strftime(
-        "%a, %#d %B %Y, %I:%M %p UTC"))
-    embed.add_field(name="Ngày tham gia:", value=member.joined_at.strftime(
-        "%a, %#d %B %Y, %I:%M %p UTC"))
-    await ctx.author.send("Đang gửi yêu cầu cho admin")
-    await checkgdv_channel.send(embed=embed, view=view)
-    time.sleep(0.5)
-    await ctx.author.send("Đã gửi")
-    await ctx.author.send(f"Tự động xóa để bảo mật thông tin của bạn {ctx.author}")
-    await ctx.channel.purge(limit=1)
+    checkgdv_channel = ctx.guild.get_channel(VOTE_CHANNEL_ID)
+    print(ctx.author)
+    global member_tag
+    member_tag = member
+    if member_tag == None:
+        await ctx.send("Bạn đã nhập thiếu giá trị @[user]")
+    elif member_tag == ctx.author:
+        await ctx.send("Bạn không được tự vote chính mình")
+    else:
+        await open_vote_data(member_tag)
+        print("command vote member_tag",member_tag)
+        get_member_tag = await get_vote_data()
+
+        vote_count = get_member_tag[str(member_tag.id)]["Vouch"]
+
+        embed = discord.Embed(title = f"Vote {member_tag}",timestamp=ctx.message.created_at, color = discord.Color.blurple())
+        embed.set_author(name=f"Duyệt vote - người gửi yêu cầu: {ctx.author}")
+        embed.add_field(name="Số vote", value = f"{vote_count}")
+        embed.add_field(name=f"Vai trò ({len(roles)})", value=" ".join([role.mention for role in roles]))
+        embed.add_field(name="ID:", value=member.id)
+        embed.add_field(name="ID:", value=member.id)
+        embed.add_field(name="Tên hiển thị:", value=member.display_name)
+        embed.add_field(name="Ngày tạo:", value=member.created_at.strftime(
+            "%a, %#d %B %Y, %I:%M %p UTC"))
+        embed.add_field(name="Ngày tham gia:", value=member.joined_at.strftime(
+            "%a, %#d %B %Y, %I:%M %p UTC"))
+        await ctx.author.send("Đang gửi yêu cầu cho admin")
+        await checkgdv_channel.send(embed=embed, view=MenuVote(member_tag))
+        time.sleep(0.5)
+        await ctx.author.send("Đã gửi")
+        await ctx.author.send(f"Tự động xóa để bảo mật thông tin của bạn {ctx.author}")
+        await ctx.channel.purge(limit=1)
 
 
 @client.command(help='Hiện thông tin cá nhân')
