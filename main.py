@@ -236,6 +236,22 @@ async def checkcoc(ctx, user: discord.Member = None):
 async def clear(ctx, amount: int):
     await ctx.channel.purge(limit=amount + 1)
 
+async def open_vote_data(member_tag):
+    get_member_tag = await get_vote_data()
+    if str(member_tag.id) in get_member_tag:
+        return False
+    else:
+        get_member_tag[str(member_tag.id)] = {"Vouch": 0}
+    print("get member in data",get_member_tag)
+    with open("vote_save_data.json", "w") as f:
+        json.dump(get_member_tag,f)
+    return True
+
+async def get_vote_data():
+    with open("vote_save_data.json", "r") as f:
+        get_member_tag = json.load(f)
+    print("Get vote data: ", get_member_tag)
+    return get_member_tag
 
 @client.command()
 async def vote(ctx, member: discord.Member = None):
