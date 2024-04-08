@@ -263,8 +263,10 @@ async def vote(ctx, member: discord.Member = None):
     member_tag = member
     if member_tag == None:
         await ctx.send("Bạn đã nhập thiếu giá trị @[user]")
+        await ctx.channel.purge(limit=1)
     elif member_tag == ctx.author:
         await ctx.send("Bạn không được tự vote chính mình")
+        await ctx.channel.purge(limit=1)
     else:
         await open_vote_data(member_tag)
         print("command vote member_tag",member_tag)
